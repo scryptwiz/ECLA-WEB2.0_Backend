@@ -5,10 +5,27 @@ const Schema = mongoose.Schema;
 const usersSchema = new Schema({
     username:{
         type: String,
-        require:true
+        require:true,
+        default:'Unnamed'
     },
-    publicAddress: {
+    walletAddress: {
         type: String,
+        require: true,
+        unique: true
+    },
+    transactionHistory: {
+        type: Array,
+        default: [],
+        require: true
+    }, 
+    email: {
+        type: String,
+        default: '',
+        require: true
+    },
+    profile: {
+        type:String,
+        default: 'https://storage.googleapis.com/opensea-static/opensea-profile/12.png',
         require: true
     }
 }, { timestamps: true });

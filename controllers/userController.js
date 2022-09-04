@@ -1,20 +1,79 @@
 const usersModel = require("../Models/dbSchema");
+const jwt = require('jsonwebtoken')
 
-const signup = (req,res) => {
-    let {username, publicAddress} = req.body;
-    if (!username|| !publicAddress) {
+const connect = (req,res) => {
+    let {walletAddress} = req.body;
+    if (!walletAddress) {
         res.json({status: false, message:"All fields must be filled"})
     } else {
-        const signupInfo = new usersModel({ username, publicAddress })
+        const signupInfo = new usersModel({ walletAddress })
         signupInfo.save((err) => {
             if (!err) { 
                 res.json({message: "Signed up successfully", status: true})
             } else if (err) {
-                res.json({message: err.message, status: false})
-                res.json(req.body)
+                if (err.keyPattern.username == 1) {
+                    res.json({message: "Email already existed", status: false})
+                } else if (err.keyPattern.walletAddress == 1) {
+                    usersModel.findOne({walletAddress}, async(err,result)=>{
+                        if (err) {
+                            res.json({message:"Network Error", status:false})
+                        } else if (result) {
+                            // jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d", issuer: "localhost:3000"}, (err, token)=>{
+                            jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d"}, (err, token)=>{
+                                if(err){
+                                    {err.message=="jwt expired"? res.json({message: "Session timed out, kindly connect you wallet", status: false}) : res.json({message:'Network Error', status:false});}
+                                }else {
+                                    res.json({message:"Login Succesfully" ,token, status: true})
+                                } 
+                            })
+                        }
+                    })
+                } else {
+                    res.json({message: err.message, status: false})
+                }
             }
         })
     }
 }
 
-module.exports = {signup}
+const verifyLogin = (req,res) => {
+    let token = req.headers.authorization.split(' ')[1]
+    jwt.verify(token, process.env.JWT_SECRET,(err, decoded)=>{
+        if(err){
+            res.json({message:'Token no gree verify', status:false})
+        } else {
+            if (decoded) {
+                res.json({message:decoded, status:true})
+            }
+        }
+    })
+}
+
+const editProfile = (req,res) => {
+    let {email, profileImage, username, walletAddress} = req.body;
+    // if (username.toLowercase!="unnamed") {
+    //     usersModel.findOne({username}, async(err,result)=>{
+    //         if (err) {
+    //             res.json({message:"Network Error", status:false})
+    //         } else if (result) {
+    //             res.json({message:"Username aleady taken by another user", status:false})
+    //         } else if (result==null) {
+    //             res.json({message:"Username Updated"})
+    //         }
+    //     })
+    // } else {
+    //     if (email.length>0) {
+    //         usersModel.findOne({Email}, async(err,result)=>{
+    //             if (err) {
+    //                 res.json({message:"Network Error", status:false})
+    //             } else if (result) {
+    //                 res.json({message:"Email aleady taken by another user", status:false})
+    //             } else if (result==null) {
+    //                 res.json({message:"Email Updated"})
+    //             }
+    //         })
+    //     } else {}
+    // }
+}
+
+module.exports = {connect, editProfile, verifyLogin}
