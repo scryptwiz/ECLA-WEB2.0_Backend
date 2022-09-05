@@ -6,17 +6,15 @@ const connect = (req,res) => {
     if (!walletAddress) {
         res.json({status: false, message:"All fields must be filled"})
     } else {
-        const signupInfo = new usersModel({ walletAddress })
-        signupInfo.save((err) => {
+        const connectInfo = new usersModel({ walletAddress })
+        connectInfo.save((err) => {
             if (!err) { 
                 res.json({message: "Signed up successfully", status: true})
             } else if (err) {
-                if (err.keyPattern.username == 1) {
-                    res.json({message: "Email already existed", status: false})
-                } else if (err.keyPattern.walletAddress == 1) {
+                if (err.keyPattern.walletAddress == 1) {
                     usersModel.findOne({walletAddress}, async(err,result)=>{
                         if (err) {
-                            res.json({message:"Network Error", status:false})
+                            res.json({message:err.message, status:false})
                         } else if (result) {
                             // jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d", issuer: "localhost:3000"}, (err, token)=>{
                             jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d"}, (err, token)=>{
