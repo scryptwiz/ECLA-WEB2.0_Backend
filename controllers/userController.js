@@ -27,7 +27,7 @@ const connect = (req,res) => {
                         }
                     })
                 } else {
-                    res.json({message: err.message, status: false})
+                    res.json({message: "Network", status: false})
                 }
             }
         })
