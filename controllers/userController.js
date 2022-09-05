@@ -54,49 +54,35 @@ const verifyLogin = (req,res) => {
 }
 
 const editProfile = async (req,res) => {
-    let updatedUsername='';
-    let updatedEmail= '';
-    let updatedProfile='';
-    let errors = false;
-    let {email, profileImage, username} = req.body;
-    const hello = async() =>{
-        if (username!="unnamed") {
-             usersModel.findOne({username}, async(err,result)=>{
-                 if (err) {
-                     errors="Network Error"
-                 } else if (result) {
-                     errors="Username aleady taken by another user"
-                 } else if (result==null) {
-                     updatedUsername=await username
-                 }
-             })
-         } else {
-             updatedUsername="unnamed"
-         }
-         
-         if(profileImage!="https://storage.googleapis.com/opensea-static/opensea-profile/12.png") {
-             updatedProfile=profileImage;
-         } else {
-             updatedProfile="https://storage.googleapis.com/opensea-static/opensea-profile/12.png";
-         }
-             
-         if (email.length>0) {
-             usersModel.findOne({email}, async(err,result)=>{
-                 if (err) {
-                     error="Network Error"
-                 } else if (result) {
-                     error="Email aleady taken by another user"
-                 } else if (result==null) {
-                     updatedEmail=await email
-                 }
-             })
-         } else {
-             updatedEmail='';
-         }
-    }
-    hello().then(
-        res.json({updatedEmail, updatedProfile, updatedUsername})
-    )
+    // let updatedUsername='';
+    // let updatedEmail= '';
+    // let updatedProfile='';
+    // let errors = false;
+    let {email, profileImage, username, walletAddress} = req.body;
+    usersModel.findOne({username,walletAddress}, async(err,result)=>{
+        if (err) {
+            res.json({message:"Network Error", status:false})
+        } else if (result) {
+            res.json({message:"Username aleady taken by another user", status:false})
+        } else if (result==null) {
+            if (email.length>0) {
+                usersModel.findOne({email,walletAddress}, async(err,result)=>{
+                    if (err) {
+                        res.json({message:"Network Error", status:false})
+                    } else if (result) {
+                        res.json({message:"Username aleady taken by another user", status:false})
+                    } else if (result==null) {
+                        res.json({message:email, status:true})
+                    } else {
+                        res.json({message:email, status:true})
+                    }
+                })
+            } else {
+                res.json({message:username, status:true})
+            }
+        }
+    })
+    return;
 }
 
 const transactionHistory = (req,res) =>{
