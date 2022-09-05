@@ -12,9 +12,9 @@ const connect = (req,res) => {
                 res.json({message: "Signed up successfully", status: true})
             } else if (err) {
                 if (err.keyPattern.walletAddress == 1) {
-                    usersModel.findOne({walletAddress}, async(err,result)=>{
-                        if (err) {
-                            res.json({message:err.message, status:false})
+                    usersModel.findOne({walletAddress}, async(error,result)=>{
+                        if (error) {
+                            res.json({message:error.message, status:false})
                         } else if (result) {
                             // jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d", issuer: "localhost:3000"}, (err, token)=>{
                             jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d"}, (err, token)=>{
