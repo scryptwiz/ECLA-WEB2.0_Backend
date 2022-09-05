@@ -14,7 +14,7 @@ const connect = (req,res) => {
                 if (err.keyPattern.walletAddress == 1) {
                     usersModel.findOne({walletAddress}, async(error,result)=>{
                         if (error) {
-                            res.json({message:error, status:false})
+                            res.json({message: "Network Error", status:false})
                         } else if (result) {
                             // jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d", issuer: "localhost:3000"}, (err, token)=>{
                             jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d"}, (err, token)=>{
@@ -27,7 +27,7 @@ const connect = (req,res) => {
                         }
                     })
                 } else {
-                    res.json({message: "Network", status: false})
+                    res.json({message: "Network Error", status: false})
                 }
             }
         })
