@@ -8,8 +8,14 @@ const connect = (req,res) => {
     } else {
         const connectInfo = new usersModel({ walletAddress })
         connectInfo.save((err) => {
-            if (!err) { 
-                res.json({message: "Signed up successfully", status: true})
+            if (!err) {
+                jwt.sign({walletAddress}, process.env.JWT_SECRET, {expiresIn: "30d"}, (err, token)=>{
+                    if(err){
+                        {err.message=="jwt expired"? res.json({message: "Session timed out, kindly connect you wallet", status: false}) : res.json({message:'Network Error', status:false});}
+                    }else {
+                        res.json({message:"Registered Succesfully" ,token, status: true})
+                    } 
+                })
             } else if (err) {
                 if (err.keyPattern.walletAddress == 1) {
                     usersModel.findOne({walletAddress}, async(error,result)=>{
