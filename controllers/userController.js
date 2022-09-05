@@ -53,31 +53,62 @@ const verifyLogin = (req,res) => {
     })
 }
 
-const editProfile = (req,res) => {
-    let {email, profileImage, username, walletAddress} = req.body;
-    // if (username.toLowercase!="unnamed") {
-    //     usersModel.findOne({username}, async(err,result)=>{
-    //         if (err) {
-    //             res.json({message:"Network Error", status:false})
-    //         } else if (result) {
-    //             res.json({message:"Username aleady taken by another user", status:false})
-    //         } else if (result==null) {
-    //             res.json({message:"Username Updated"})
-    //         }
-    //     })
-    // } else {
-    //     if (email.length>0) {
-    //         usersModel.findOne({Email}, async(err,result)=>{
-    //             if (err) {
-    //                 res.json({message:"Network Error", status:false})
-    //             } else if (result) {
-    //                 res.json({message:"Email aleady taken by another user", status:false})
-    //             } else if (result==null) {
-    //                 res.json({message:"Email Updated"})
-    //             }
-    //         })
-    //     } else {}
-    // }
+const editProfile = async (req,res) => {
+    let updatedUsername='';
+    let updatedEmail= '';
+    let updatedProfile='';
+    let errors = false;
+    let {email, profileImage, username} = req.body;
+    const hello = async() =>{
+        if (username!="unnamed") {
+             usersModel.findOne({username}, async(err,result)=>{
+                 if (err) {
+                     errors="Network Error"
+                 } else if (result) {
+                     errors="Username aleady taken by another user"
+                 } else if (result==null) {
+                     updatedUsername=await username
+                 }
+             })
+         } else {
+             updatedUsername="unnamed"
+         }
+         
+         if(profileImage!="https://storage.googleapis.com/opensea-static/opensea-profile/12.png") {
+             updatedProfile=profileImage;
+         } else {
+             updatedProfile="https://storage.googleapis.com/opensea-static/opensea-profile/12.png";
+         }
+             
+         if (email.length>0) {
+             usersModel.findOne({email}, async(err,result)=>{
+                 if (err) {
+                     error="Network Error"
+                 } else if (result) {
+                     error="Email aleady taken by another user"
+                 } else if (result==null) {
+                     updatedEmail=await email
+                 }
+             })
+         } else {
+             updatedEmail='';
+         }
+    }
+    hello().then(
+        res.json({updatedEmail, updatedProfile, updatedUsername})
+    )
 }
 
-module.exports = {connect, editProfile, verifyLogin}
+const transactionHistory = (req,res) =>{
+    let {walletAddress,product} =req.body
+    usersModel.updateOne({walletAddress}, {$push:{transactionHistory:product}}, (error)=>{
+        if (error) {
+            res.json({status:false, message:err.message})
+        } else {
+            res.json({status: true, message:"Transaction History Added Successfully"})
+        }
+    })
+}
+
+
+module.exports = {connect, editProfile, verifyLogin, transactionHistory}
