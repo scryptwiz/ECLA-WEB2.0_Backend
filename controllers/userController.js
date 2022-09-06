@@ -59,26 +59,22 @@ const editProfile = async (req,res) => {
     // let updatedProfile='';
     // let errors = false;
     let {email, profileImage, username, walletAddress} = req.body;
-    usersModel.findOne({username,walletAddress}, async(err,result)=>{
+    usersModel.findOne({username,walletAddress:!walletAddress}, async(err,result)=>{
         if (err) {
             res.json({message:"Network Error", status:false})
         } else if (result) {
             res.json({message:"Username aleady taken by another user", status:false})
         } else if (result==null) {
             if (email.length>0) {
-                usersModel.findOne({email,walletAddress}, async(err,result)=>{
+                usersModel.findOne({email,walletAddress:!walletAddress}, async(err,result)=>{
                     if (err) {
                         res.json({message:"Network Error", status:false})
                     } else if (result) {
                         res.json({message:"Username aleady taken by another user", status:false})
                     } else if (result==null) {
                         res.json({message:email, status:true})
-                    } else {
-                        res.json({message:email, status:true})
                     }
                 })
-            } else {
-                res.json({message:username, status:true})
             }
         }
     })

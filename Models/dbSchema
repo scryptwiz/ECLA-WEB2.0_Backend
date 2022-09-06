@@ -6,7 +6,7 @@ const usersSchema = new Schema({
     username:{
         type: String,
         require:true,
-        default:'Unnamed'
+        default:''
     },
     walletAddress: {
         type: String,
