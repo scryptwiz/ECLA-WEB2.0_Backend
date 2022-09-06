@@ -37,3 +37,28 @@ const editProfile = (req,res) => {
         updatedProfile="https://storage.googleapis.com/opensea-static/opensea-profile/12.png";
     }
 }
+
+
+
+
+
+usersModel.findOne({username,walletAddress:!walletAddress}, async(err,result)=>{
+        if (err) {
+            res.json({message:"Network Error", status:false})
+        } else if (result) {
+            res.json({message:"Username aleady taken by another user", status:false})
+        } else if (result==null) {
+            if (email.length>0) {
+                usersModel.findOne({email,walletAddress:!walletAddress}, async(err,result)=>{
+                    if (err) {
+                        res.json({message:"Network Error", status:false})
+                    } else if (result) {
+                        res.json({message:"Email aleady taken by another user", status:false})
+                    } else if (result==null) {
+
+                        res.json({message:{email, username}, status:true})
+                    }
+                })
+            }
+        }
+    })

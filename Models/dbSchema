@@ -23,7 +23,7 @@ const usersSchema = new Schema({
         default: '',
         require: true
     },
-    profile: {
+    profileImage: {
         type:String,
         default: '',
         require: true

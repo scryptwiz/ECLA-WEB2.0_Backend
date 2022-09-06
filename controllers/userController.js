@@ -1,5 +1,6 @@
 const usersModel = require("../Models/dbSchema");
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { trusted } = require("mongoose");
 
 const connect = (req,res) => {
     let {walletAddress} = req.body;
@@ -53,39 +54,53 @@ const verifyLogin = (req,res) => {
     })
 }
 
-const editProfile = async (req,res) => {
-    let updatedUsername='';
-    let updatedEmail= '';
-    let updatedProfile='';
-    let {email, profileImage, username, walletAddress} = req.body;
-    usersModel.findOne({username,walletAddress:!walletAddress}, async(err,result)=>{
-        if (err) {
-            res.json({message:"Network Error", status:false})
-        } else if (result) {
-            res.json({message:"Username aleady taken by another user", status:false})
-        } else if (result==null) {
-            if (email.length>0) {
-                usersModel.findOne({email,walletAddress:!walletAddress}, async(err,result)=>{
-                    if (err) {
-                        res.json({message:"Network Error", status:false})
-                    } else if (result) {
-                        res.json({message:"Username aleady taken by another user", status:false})
-                    } else if (result==null) {
-                        if(profileImage.length>0){
-                            updatedUsername=username,
-                            updatedEmail=email,
-                            updatedProfile=profileImage
-                        } else {
-                            updatedUsername=username,
-                            updatedEmail=email,
-                            updatedProfile=''
-                        }
-                    }
-                })
+const checkUsername = (req,res)=>{
+    let {username,walletAddress} = req.body;
+    if (username.length>0) {
+        usersModel.findOne({username,walletAddress:!walletAddress}, async(err,result)=>{
+            if (err) {
+                res.json({message:"Network Error", updateUsername: false,status:false})
+            } else if (result) {
+                res.json({message:"Username aleady taken by another user", updateUsername: false, status:false})
+            } else if (result==null) {
+                res.json({updateUsername: true})
             }
-        }
-    })
-    return;
+        })
+    } else {
+        res.json({updateUsername: true})
+    }
+} 
+
+const checkEmail = (req,res)=>{
+    let {email,walletAddress} = req.body;
+    if (email.length>0) {
+        usersModel.findOne({email,walletAddress:!walletAddress}, async(err,result)=>{
+            if (err) {
+                res.json({message:"Network Error", updateEmail: false,status:false})
+            } else if (result) {
+                res.json({message:"email aleady taken by another user", updateEmail: false, status:false})
+            } else if (result==null) {
+                res.json({updateEmail: true})
+            }
+        })
+    } else {
+        res.json({updateEmail: true})
+    }
+} 
+
+const editProfile = async (req,res) => {
+    let {email, profileImage, username, walletAddress,updateEmail,updateUsername} = req.body;
+    if (updateEmail && updateUsername) {
+        usersModel.updateOne({walletAddress},{email,profileImage,username}, {new:true},(err)=>{
+            if(err){
+                res.json({message:err.message, status:false})
+            } else {
+                res.json({message:"Updated successfully", status:true})
+            }
+        })
+    } else {
+        res.json({message:"All fields has to be filled", status:false})
+    }
 }
 
 const transactionHistory = (req,res) =>{
@@ -100,4 +115,4 @@ const transactionHistory = (req,res) =>{
 }
 
 
-module.exports = {connect, editProfile, verifyLogin, transactionHistory}
+module.exports = {connect, editProfile, verifyLogin, transactionHistory,checkUsername, checkEmail}
