@@ -54,10 +54,9 @@ const verifyLogin = (req,res) => {
 }
 
 const editProfile = async (req,res) => {
-    // let updatedUsername='';
-    // let updatedEmail= '';
-    // let updatedProfile='';
-    // let errors = false;
+    let updatedUsername='';
+    let updatedEmail= '';
+    let updatedProfile='';
     let {email, profileImage, username, walletAddress} = req.body;
     usersModel.findOne({username,walletAddress:!walletAddress}, async(err,result)=>{
         if (err) {
@@ -72,7 +71,15 @@ const editProfile = async (req,res) => {
                     } else if (result) {
                         res.json({message:"Username aleady taken by another user", status:false})
                     } else if (result==null) {
-                        res.json({message:email, status:true})
+                        if(profileImage.length>0){
+                            updatedUsername=username,
+                            updatedEmail=email,
+                            updatedProfile=profileImage
+                        } else {
+                            updatedUsername=username,
+                            updatedEmail=email,
+                            updatedProfile=''
+                        }
                     }
                 })
             }

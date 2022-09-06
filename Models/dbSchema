@@ -25,7 +25,7 @@ const usersSchema = new Schema({
     },
     profile: {
         type:String,
-        default: 'https://storage.googleapis.com/opensea-static/opensea-profile/12.png',
+        default: '',
         require: true
     }
 }, { timestamps: true });
