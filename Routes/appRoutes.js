@@ -3,7 +3,7 @@ const { editProfile, connect, verifyLogin, transactionHistory, checkUsername, ch
 const router = express.Router();
 
 router.post('/user/connect', connect)
-router.post('/user/verify', verifyLogin)
+router.get('/user/verify', verifyLogin)
 router.post('/user/editprofile', editProfile)
 router.post('/user/update/email', checkEmail)
 router.post('/user/update/username', checkUsername)
