@@ -86,11 +86,22 @@ const checkEmail = (req,res)=>{
     } else {
         res.json({updateEmail: true})
     }
-} 
+}
+
+const findWallet = (req,res) =>{
+    let { walletAddress } = req.body;
+    usersModel.findOne({walletAddress}, async(error,result)=>{
+        if (error) {
+            res.json({message: "Network Error", status:false})
+        } else if (result) {
+            res.json({message:"Login Succesfully", result, status: true})
+        }
+    })
+}
 
 const editProfile = async (req,res) => {
     let {email, profileImage, username, walletAddress,updateEmail,updateUsername} = req.body;
-    if (updateEmail && updateUsername) {
+    if (updateEmail || updateUsername) {
         usersModel.updateOne({walletAddress},{email,profileImage,username}, {new:true},(err)=>{
             if(err){
                 res.json({message:err.message, status:false})
@@ -115,4 +126,4 @@ const transactionHistory = (req,res) =>{
 }
 
 
-module.exports = {connect, editProfile, verifyLogin, transactionHistory,checkUsername, checkEmail}
+module.exports = {connect, editProfile, verifyLogin, transactionHistory,checkUsername, checkEmail, findWallet}
