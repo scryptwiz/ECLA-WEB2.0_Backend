@@ -59,15 +59,15 @@ const checkUsername = (req,res)=>{
     if (username.length>0) {
         usersModel.findOne({username,walletAddress:!walletAddress}, async(err,result)=>{
             if (err) {
-                res.json({message:"Network Error", updateUsername: false,status:false})
+                res.json({message:"Network Error",status:false})
             } else if (result) {
-                res.json({message:"Username aleady taken by another user", updateUsername: false, status:false})
+                res.json({message:"Username aleady taken by another user", status:false})
             } else if (result==null) {
-                res.json({updateUsername: true})
+                res.json({status: true})
             }
         })
     } else {
-        res.json({updateUsername: true})
+        res.json({status: true})
     }
 } 
 
@@ -76,15 +76,15 @@ const checkEmail = (req,res)=>{
     if (email.length>0) {
         usersModel.findOne({email,walletAddress:!walletAddress}, async(err,result)=>{
             if (err) {
-                res.json({message:"Network Error", updateEmail: false,status:false})
+                res.json({message:"Network Error",status:false})
             } else if (result) {
-                res.json({message:"email aleady taken by another user", updateEmail: false, status:false})
+                res.json({message:"email aleady taken by another user", status:false})
             } else if (result==null) {
-                res.json({updateEmail: true})
+                res.json({status: true})
             }
         })
     } else {
-        res.json({updateEmail: true})
+        res.json({status: true})
     }
 }
 
@@ -94,7 +94,7 @@ const findWallet = (req,res) =>{
         if (error) {
             res.json({message: "Network Error", status:false})
         } else if (result) {
-            res.json({message:"Login Succesfully", result, status: true})
+            res.json({result, status: true})
         }
     })
 }
